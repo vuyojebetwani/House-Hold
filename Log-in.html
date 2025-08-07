@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>House Hold - Login</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Open+Sans&display=swap" />
+<style>
+  body {
+    margin: 0; padding: 0;
+    background: linear-gradient(135deg, #f0f2f5, #d9e2ec);
+    font-family: 'Open Sans', sans-serif;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    justify-content: center;
+  }
+  .container {
+    background: white;
+    padding: 40px 50px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+    width: 320px;
+    box-sizing: border-box;
+  }
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    letter-spacing: 2px;
+    color: #2c3e50;
+    text-align: center;
+  }
+  label {
+    display: block;
+    margin-top: 20px;
+    font-weight: 600;
+    color: #34495e;
+  }
+  input[type="text"], input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    border-radius: 10px;
+    border: 2px solid #bdc3c7;
+    font-size: 1rem;
+    outline-color: #38bdf8;
+    box-sizing: border-box;
+  }
+  button {
+    width: 100%;
+    margin-top: 30px;
+    padding: 12px;
+    background: #38bdf8;
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background: #0ea5e9;
+  }
+  .toggle-link {
+    margin-top: 25px;
+    color: #34495e;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    text-decoration: underline;
+  }
+  .toggle-link:hover {
+    color: #2c3e50;
+  }
+  #error {
+    margin-top: 20px;
+    color: #e74c3c;
+    font-weight: 600;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1 id="formTitle">Login</h1>
+    <form id="authForm">
+      <label for="username">Username</label>
+      <input type="text" id="username" autocomplete="username" required />
+      <label for="password">Password</label>
+      <input type="password" id="password" autocomplete="current-password" required />
+      <button type="submit">Login</button>
+    </form>
+    <div class="toggle-link" id="toggleForm">New user? Register here</div>
+    <div id="error"></div>
+  </div>
+
+<script>
+  const form = document.getElementById('authForm');
+  const toggleLink = document.getElementById('toggleForm');
+  const formTitle = document.getElementById('formTitle');
+  const errorDiv = document.getElementById('error');
+  let isLogin = true;
+
+  toggleLink.onclick = () => {
+    isLogin = !isLogin;
+    formTitle.textContent = isLogin ? 'Login' : 'Register';
+    form.querySelector('button').textContent = isLogin ? 'Login' : 'Register';
+    toggleLink.textContent = isLogin ? 'New user? Register here' : 'Already have an account? Login here';
+    errorDiv.textContent = '';
+    form.reset();
+  };
+
+  form.onsubmit = e => {
+    e.preventDefault();
+    const username = form.username.value.trim();
+    const password = form.password.value;
+
+    if (!username || !password) {
+      errorDiv.textContent = 'Please fill in all fields.';
+      return;
+    }
+
+    let users = JSON.parse(localStorage.getItem('users')) || {};
+
+    if (isLogin) {
+      if (users[username] && users[username].password === password) {
+        localStorage.setItem('currentUser', username);
+        localStorage.setItem('profilePic', users[username].profilePic || '');
+        window.location.href = 'index.html';
+      } else {
+        errorDiv.textContent = 'Invalid username or password.';
+      }
+    } else {
+      if (users[username]) {
+        errorDiv.textContent = 'Username already exists.';
+      } else {
+        users[username] = { password, profilePic: '' };
+        localStorage.setItem('users', JSON.stringify(users));
+        localStorage.setItem('currentUser', username);
+        localStorage.setItem('profilePic', '');
+        window.location.href = 'index.html';
+      }
+    }
+  };
+</script>
+</body>
+</html>

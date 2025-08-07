@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Shopping List - House Hold</title>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #f0f2f5, #d9e2ec);
+      font-family: 'Open Sans', sans-serif;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      background-color: #9aa3aa;
+      color: white;
+      padding: 20px 10px 10px 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .profile-pic {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #ffffffcc;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      font-weight: 600;
+      margin: 0 0 20px 0;
+      letter-spacing: 1px;
+    }
+
+    nav {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 700px;
+      margin-bottom: 10px;
+    }
+
+    nav a {
+      text-decoration: none;
+      background: white;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1rem;
+      color: #34495e;
+      box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+
+    nav a:hover,
+    nav a:focus {
+      background: #34495e;
+      color: #ecf0f1;
+      border-color: #2c3e50;
+      box-shadow: 0 8px 15px rgba(50, 50, 93, 0.2), 0 3px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    main {
+      padding: 30px 20px;
+      width: 100%;
+      max-width: 1000px;
+    }
+
+    #add-section {
+      display: grid;
+      gap: 10px;
+      margin: 0 auto;
+      max-width: 400px;
+      width: 100%;
+    }
+
+    input, select {
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+
+    input[type="file"] {
+      padding: 0;
+    }
+
+    button {
+      padding: 12px;
+      background-color: #7f9cf5;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #5b7cfa;
+    }
+
+    #shoppingList {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    .item-card {
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      padding: 15px;
+      width: 220px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .item-card img {
+      width: 100px;
+      height: 100px;
+      border-radius: 10px;
+      object-fit: cover;
+      margin-bottom: 10px;
+    }
+
+    .item-card .info {
+      font-size: 0.95rem;
+      margin-bottom: 10px;
+    }
+
+    .remove-btn {
+      background-color: #ff4d4f;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      font-size: 0.9rem;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .remove-btn:hover {
+      background-color: #d9363e;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img id="profilePreview" class="profile-pic" src="" style="display:none;">
+    <h1>Shopping Items to Buy</h1>
+    <nav>
+      <a href="index.html">HOME</a>
+      <a href="summer.html">Summer</a>
+      <a href="winter.html">Winter</a>
+      <a href="hats.html">Hats & Caps</a>
+      <a href="shoes.html">Shoes</a>
+      <a href="laundry.html">Laundry Basket</a>
+    </nav>
+  </header>
+
+  <main>
+    <div id="add-section">
+      <input type="text" id="itemName" placeholder="Item Name">
+      <input type="text" id="itemCode" placeholder="Item Code (optional)">
+      <input type="text" id="storeName" placeholder="Store or Platform (e.g., Shein)">
+      <input type="file" id="itemImage" accept="image/*">
+      <button onclick="addItem()">Add Item</button>
+    </div>
+
+    <div id="shoppingList"></div>
+  </main>
+
+  <script>
+    let shoppingItems = JSON.parse(localStorage.getItem("shoppingItems")) || [];
+
+    function saveShoppingItems() {
+      localStorage.setItem("shoppingItems", JSON.stringify(shoppingItems));
+    }
+
+    function renderShoppingItems() {
+      const list = document.getElementById("shoppingList");
+      list.innerHTML = "";
+      shoppingItems.forEach((item, index) => {
+        const card = document.createElement("div");
+        card.className = "item-card";
+
+        const img = document.createElement("img");
+        img.src = item.image || "";
+        card.appendChild(img);
+
+        const info = document.createElement("div");
+        info.className = "info";
+        info.innerHTML = `
+          <strong>${item.name}</strong><br>
+          ${item.code ? `Code: ${item.code}<br>` : ""}
+          <em>From: ${item.store}</em>
+        `;
+        card.appendChild(info);
+
+        const removeBtn = document.createElement("button");
+        removeBtn.className = "remove-btn";
+        removeBtn.textContent = "Remove";
+        removeBtn.onclick = () => removeItem(index);
+        card.appendChild(removeBtn);
+
+        list.appendChild(card);
+      });
+    }
+
+    function addItem() {
+      const name = document.getElementById("itemName").value.trim();
+      const code = document.getElementById("itemCode").value.trim();
+      const store = document.getElementById("storeName").value.trim();
+      const fileInput = document.getElementById("itemImage");
+      const file = fileInput.files[0];
+
+      if (!name || !store) {
+        alert("Please enter item name and store/platform.");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const imageData = e.target.result;
+        const newItem = { name, code, store, image: imageData };
+        shoppingItems.push(newItem);
+        saveShoppingItems();
+        renderShoppingItems();
+        document.getElementById("itemName").value = "";
+        document.getElementById("itemCode").value = "";
+        document.getElementById("storeName").value = "";
+        document.getElementById("itemImage").value = "";
+      };
+
+      if (file) {
+        reader.readAsDataURL(file);
+      } else {
+        const newItem = { name, code, store, image: "" };
+        shoppingItems.push(newItem);
+        saveShoppingItems();
+        renderShoppingItems();
+        document.getElementById("itemName").value = "";
+        document.getElementById("itemCode").value = "";
+        document.getElementById("storeName").value = "";
+      }
+    }
+
+    function removeItem(index) {
+      shoppingItems.splice(index, 1);
+      saveShoppingItems();
+      renderShoppingItems();
+    }
+
+    window.onload = () => {
+      const storedPic = localStorage.getItem('profilePic');
+      if (storedPic) {
+        document.getElementById('profilePreview').src = storedPic;
+        document.getElementById('profilePreview').style.display = 'block';
+      }
+      renderShoppingItems();
+    };
+  </script>
+</body>
+</html>
